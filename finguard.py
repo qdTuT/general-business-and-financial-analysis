@@ -8,14 +8,14 @@ from langgraph.graph import StateGraph, END
 from dotenv import load_dotenv
 import datetime
 
-# 获取当前文件的父目录的父目录下的 .env
+# 获取当前文件父目录下的.env；若.env位于同目录下，命令更改为：load_dotenv()
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
 
 
 # 1. Schema: 定义状态数据结构 (State)
 class AgentState(TypedDict):
     task: str  # 用户输入的广泛商业/金融问题
-    search_queries: List[str]  # AI 自动拆解出的搜索关键词
+    search_queries: List[str]  # AI自动拆解出的搜索关键词
     raw_data: str  # 从全网抓取回来的非结构化数据
     draft_report: str  # 分析师写出的初稿
     feedback: List[str]  # 审查官给出的修改建议
@@ -38,9 +38,9 @@ def perform_web_research(query: str) -> str:
 
 # 3. Agents: 各个智能体的核心业务逻辑
 llm = ChatOpenAI(
-    model=os.getenv("AIHUBMIX_MODEL_ID"),
-    openai_api_key=os.getenv("AIHUBMIX_API_KEY"),
-    base_url=os.getenv("AIHUBMIX_BASE_URL"),
+    model=os.getenv("OPENAI_MODEL_ID"),
+    openai_api_key=os.getenv("OPENAI_API_KEY"),
+    base_url=os.getenv("OPENAI_BASE_URL"),
     temperature=0.2
 )
 
@@ -154,7 +154,7 @@ def reviewer_node(state: AgentState):
     return {"quality_score": score, "feedback": [review_text]}
 
 
-# 4. Graph: 构建多 Agent 协作工作流 (StateGraph)
+# 4. Graph: 构建多Agent协作工作流 (StateGraph)
 def build_workflow():
     """编排工作流节点与流转逻辑"""
     workflow = StateGraph(AgentState)
